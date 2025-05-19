@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>History Match - Producción</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+
+  <!-- Estilos CSS personalizados -->
+  <link rel="stylesheet" href="../static/styles.css">
+</head>
+
+<body>
+  <!-- Encabezado -->
+  <header>
+    <h1> History Match </h1>
+    <p> Ajuste histórico de producción en yacimientos petroleros.</p>
+  </header>
+
+  <!-- Sección de carga de datos -->
+  <div class="panel">
+    <h2>1. Carga de datos y parámetros</h2>
+    <div class="upload-box">
+      <input type="file" id="csvInput" accept=".csv">
+      <p>Formato requerido: Tiempo (dd/mm/yyyy), RateOil, RateWater, BSW</p>
+    </div>
+    
+    <!-- Controles de parámetros -->
+    <!-- <div class="param-container">
+      <div class="param-item">
+        <label>Permeabilidad (mD):</label>
+        <input type="number" id="kInput" value="150" step="10">
+      </div>
+      <div class="param-item">
+        <label>Porosidad (%):</label>
+        <input type="number" id="phiInput" value="18" step="1">
+      </div>
+      <div class="param-item">
+        <label>FVF:</label>
+        <input type="number" id="fvfInput" value="1.2" step="0.1">
+      </div>
+    </div> -->
+    <!-- <button onclick="iniciarAjuste()">Ejecutar Ajuste</button> -->
+    <button onclick="ejecutarSimulaciones()">Ejecutar simulación</button>
+  </div>
+
+  <!-- Sección de resultados -->
+  <div class="panel">
+    
+    
+    <canvas id="graficoWater"></canvas>
+    <canvas id="graficoBSW"></canvas>
+    <h2>2. Resultados del History Match</h2>
+    <canvas id="graficoOil"></canvas>
+    <div id="resultados"></div>
+  </div>
+
+  <!-- Pie de página -->
+  <footer>
+    Desarrollado por Nayeli Castellano
+  </footer>
+  <canvas id="graficoDeclinacion"></canvas>
+
+  <script src="../static//index.js"></script>
+
+
+</body>
+</html>
