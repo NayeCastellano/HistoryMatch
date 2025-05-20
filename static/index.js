@@ -1,6 +1,6 @@
 // Variables globales
 let datos = []; // Almacena los datos históricos
-let graficoOil, graficoWater, graficoBSW; // Objetos de gráficos
+let graficoOil, graficoWater, graficoBSW, graficoAccumulatedOil; // Objetos de gráficos
 let datosHistoricos = [];
 let fechasHistoricas = [];
 let simulacionValidacion = {};
@@ -68,7 +68,6 @@ function inicializarGraficos() {
         fill: false
         
       }, 
-      
       {
         label: 'Rate Oil (simulado)',
         borderColor: '#36A2EB', // Azul
@@ -96,7 +95,7 @@ function inicializarGraficos() {
         backgroundColor: '#4BC0C033',
         fill: false
       }, {
-        label: 'Rate Water (simulado)',
+        label: 'Rate Water (acumulado)',
         borderColor: '#FFCE56', // Amarillo
         backgroundColor: '#FFCE5633',
         fill: false
@@ -119,7 +118,7 @@ function inicializarGraficos() {
         backgroundColor: '#9966FF33',
         fill: false
       }, {
-        label: 'BSW % (simulado)',
+        label: 'BSW % (acummulado)',
         borderColor: '#4A4A4A', // Gris
         backgroundColor: '#4A4A4A33',
         fill: false
@@ -130,6 +129,31 @@ function inicializarGraficos() {
       plugins: { title: { text: 'BSW (%)' } }
     }
   });
+
+  graficoAccumulatedOil = new Chart(document.getElementById('graficoAccumulatedOil'), {
+    ...configComun,
+    data: {
+      label: [],
+      datasets:[
+        {
+          label: 'Producción acumulada',
+          borderColor: '#9966FF', // Morado
+          backgroundColor: '#9966FF33',
+          fill: false
+        },
+        {
+          label: 'Histórico producción',
+          borderColor: '#c65353', 
+          backgroundColor: '#9966FF33',
+          fill: false
+        },
+      ]
+    },
+    options: {
+      ...configComun.options,
+      plugins: { title: { text: 'Producción acumulada' } }
+    }
+  })
 }
 
 /* Función: iniciarAjuste
@@ -243,8 +267,18 @@ document.getElementById('csvInput').addEventListener('change', async function(e)
   // Guardamos datos globales
   datosHistoricos = result.historico.valores;
   fechasHistoricas = result.historico.fechas;
+  accumulatedOil = result.historico.accumulatedOil;
+
+  accumulatedWater = result.historico.accumulatedWater;
+  rateWater = result.historico.rateWater;
+
+  bsw = result.historico.bsw;
+  accumulatedBSW = result.historico.accumulatedBSW
+  
   simulacionValidacion = result.validacion;
   simulacionFuturo = result.futuro;
+
+
 
   // Mostrar solo el histórico inicialmente
   graficoOil.data.labels = fechasHistoricas;
@@ -252,6 +286,23 @@ document.getElementById('csvInput').addEventListener('change', async function(e)
   graficoOil.data.datasets[1].data = []; // simulaciones limpias
   graficoOil.update();
 
+  //gráfico acumulado CRUDO
+  graficoAccumulatedOil.data.labels = fechasHistoricas 
+  graficoAccumulatedOil.data.datasets[0].data = accumulatedOil
+  graficoAccumulatedOil.data.datasets[1].data = datosHistoricos
+  graficoAccumulatedOil.update()
+
+  //gráfico agua
+  graficoWater.data.labels = fechasHistoricas
+  graficoWater.data.datasets[0].data = rateWater
+  graficoWater.data.datasets[1].data = accumulatedWater
+  graficoWater.update()
+
+  //grafico bsw
+  graficoBSW.data.labels = fechasHistoricas
+  graficoBSW.data.datasets[0].data = bsw
+  graficoBSW.data.datasets[1].data = accumulatedBSW
+  graficoBSW.update()
 
 });
 

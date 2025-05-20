@@ -2,8 +2,12 @@ import pandas as pd
 import numpy as np
 
 COLUMNA_OBJETIVO = "RateOil"
+COLUMNA_ACUMULADO_OIL = "AccumulatedOil"
 COLUMNA_TIEMPO = "Tiempo"
-COLUMNA_AGUA = ""
+COLUMNA_AGUA = "RateWater"
+COLUMNA_ACUMULADO_AGUA = "AccumulatedWater"
+COLUMNA_BSW = "BSW"
+COLUMNA_BSW_ACUMULADO = "ACCUMULATED_BSW"
 N_SIMULACIONES = 1000
 N_MESES_FUTURO = 60
 
@@ -23,8 +27,31 @@ def parse_spanish_dates(series):
 def cargar_y_preparar_datos(file, columnas):
     df = pd.read_csv(file, sep=";")[columnas].copy()
     df[COLUMNA_TIEMPO] = pd.to_datetime(df[COLUMNA_TIEMPO], dayfirst=True)
-    df[COLUMNA_OBJETIVO] = df[COLUMNA_OBJETIVO].astype(str).str.replace(",", ".", regex=False)
+    
+    #PRODUCCCION 
+    df[COLUMNA_OBJETIVO] = df[COLUMNA_OBJETIVO].astype(str).str.replace(",", ".", regex=False) # TODO: Formatear datos decimales cuando tienen "," cambiarlos a "."
     df[COLUMNA_OBJETIVO] = pd.to_numeric(df[COLUMNA_OBJETIVO], errors='coerce')
+
+    df[COLUMNA_ACUMULADO_OIL] = df[COLUMNA_ACUMULADO_OIL].astype(str).str.replace(",", ".", regex=False)
+    df[COLUMNA_ACUMULADO_OIL] = pd.to_numeric(df[COLUMNA_ACUMULADO_OIL], errors='coerce')
+
+    #AGUA
+    df[COLUMNA_ACUMULADO_AGUA] = df[COLUMNA_ACUMULADO_AGUA].astype(str).str.replace(",", ".", regex=False)
+    df[COLUMNA_ACUMULADO_AGUA] = pd.to_numeric(df[COLUMNA_ACUMULADO_AGUA], errors='coerce')
+
+    df[COLUMNA_AGUA] = df[COLUMNA_AGUA].astype(str).str.replace(",", ".", regex=False)
+    df[COLUMNA_AGUA] = pd.to_numeric(df[COLUMNA_AGUA], errors='coerce')
+
+    #BSW
+    df[COLUMNA_BSW] = df[COLUMNA_BSW].astype(str).str.replace(",", ".", regex=False)
+    df[COLUMNA_BSW] = pd.to_numeric(df[COLUMNA_BSW], errors='coerce')
+
+    df[COLUMNA_BSW_ACUMULADO] = df[COLUMNA_BSW_ACUMULADO].astype(str).str.replace(",", ".", regex=False)
+    df[COLUMNA_BSW_ACUMULADO] = pd.to_numeric(df[COLUMNA_BSW_ACUMULADO], errors='coerce')
+
+
+
+
     df = df.dropna(subset=[COLUMNA_OBJETIVO])
     return df.sort_values(COLUMNA_TIEMPO).reset_index(drop=True)
 
@@ -50,7 +77,7 @@ def calcular_percentiles(simulaciones):
 
 
 def procesar_archivo_para_api(file):
-    df = cargar_y_preparar_datos(file, [COLUMNA_TIEMPO, COLUMNA_OBJETIVO])
+    df = cargar_y_preparar_datos(file, [COLUMNA_TIEMPO, COLUMNA_OBJETIVO, COLUMNA_ACUMULADO_OIL, COLUMNA_ACUMULADO_AGUA, COLUMNA_AGUA, COLUMNA_BSW, COLUMNA_BSW_ACUMULADO])
     #obtener acumulado
     df["accumulated"] = df[COLUMNA_OBJETIVO]
     midpoint = len(df) // 2
@@ -73,7 +100,12 @@ def procesar_archivo_para_api(file):
     return {
         "historico": {
             "fechas": df[COLUMNA_TIEMPO].dt.strftime('%Y-%m-%d').tolist(),
-            "valores": df[COLUMNA_OBJETIVO].tolist()
+            "valores": df[COLUMNA_OBJETIVO].tolist(),
+            "accumulatedOil": df[COLUMNA_ACUMULADO_OIL].tolist(),
+            "rateWater": df[COLUMNA_AGUA].tolist(),
+            "accumulatedWater": df[COLUMNA_ACUMULADO_AGUA].tolist(),
+            "bsw": df[COLUMNA_BSW].tolist(),
+            "accumulatedBSW": df[COLUMNA_BSW_ACUMULADO].tolist(),
         },
         "validacion": {
             "fechas": fechas_validacion,
